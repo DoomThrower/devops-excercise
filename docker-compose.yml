@@ -1,0 +1,20 @@
+version: "3"
+services:
+  # TODO: This database is used for key -> value storage, is it efficient?
+  #       and scalable?
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=backend
+      - POSTGRES_PASSWORD=backend
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db

@@ -3,7 +3,7 @@
 - [ ] **src/backend**: Improve number of requests per second **/cpu** and **/local_program** endpoints 
       (architecture-wise approach - separate monolith, provide additional containers) - 1h30m
 - [ ] **src/backend**: Provide a solution for the cache with multi-service awareness - 1h30m
-- [ ] **Dockerfile**: Fix issue with needless steps in docker image on every code change - 15m
+- [x] **Dockerfile**: Fix issue with needless steps in docker image on every code change - 15m
 - [ ] **docker-compose.yml**: Change database to something more appropriate for key-value storage 
       (noSQL: mongoDB/Redis; take high availability and resilience into consideration) - 2h30m
 
@@ -22,8 +22,11 @@
 
 # My task suggestions (based on code provided):
 - [x] **src/backend**: Fix the cpu() method in (curl returns 500 error rather than value) - 5m
-- [ ] **src/backend**: Verify that the cache solution implemented is working at all (**cache[name] = None**
+- [x] **src/backend**: Verify that the cache solution implemented is working at all (**cache[name] = None**
       does not seem like it stores the age value and my guess is it should) - 5m
+      
+      My suspicion was wrong - this line is responsible for clearing cache prior to inserting new data.
+      
 - [ ] **src/backend**: Refactor database access code (hardcoded credentials/endpoint, connection probably should 
       not be initiated on every request) - 45m
 - [ ] Prepare load-testing commands (e.g. curl), verifying consistency of the application - 45m

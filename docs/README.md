@@ -21,7 +21,7 @@
   - [ ] Add ELK stack containers (unless something better/easier will appear during research) - 2h
 
 # My task suggestions (based on code provided):
-- [ ] **src/backend**: Fix the cpu() method in (curl returns 500 error rather than value) - 5m
+- [x] **src/backend**: Fix the cpu() method in (curl returns 500 error rather than value) - 5m
 - [ ] **src/backend**: Verify that the cache solution implemented is working at all (**cache[name] = None**
       does not seem like it stores the age value and my guess is it should) - 5m
 - [ ] **src/backend**: Refactor database access code (hardcoded credentials/endpoint, connection probably should 

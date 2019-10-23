@@ -73,7 +73,8 @@ def insert_into_db(name, age):
 def cpu():
     do_log("DEBUG", "Calling cpu endpoint")
     # This function must call use_cpu_for_a_while() at least once
-    return use_cpu_for_a_while()
+    response.content_type = 'application/json'
+    return json.dumps(use_cpu_for_a_while())
 
 
 # TODO: Improve response site of this endpoint. You could improve the local

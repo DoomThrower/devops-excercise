@@ -9,7 +9,7 @@
 
 ## Tasks from README (may somewhat overlap with tasks above):
 - Improve the architecture to increase the performance, reliability and the availability of the system:
-  - [ ] Separate monolith (2 services: **db access** and **cpu/local_program**) -1h30m (accounted earlier)
+  - [x] Separate monolith (2 services: **db access** and **cpu/local_program**) -1h30m (accounted earlier)
   - [ ] Replace db service with something more scalable/resilient - 2h30m (accounted earlier)
 - Add monitoring and measurement to the project (prometheus/grafana metrics)
   - [ ] Add prometheus metrics to code - 45m
@@ -40,3 +40,12 @@ Based on these tasks, I estimate that fulfilling them would take me about 15 hou
 unforeseen complications occur. As such, I believe I will be done by **october 24th, 8PM GMT+2** (1st lvl deadline).
 
 Still, as a precaution, I would like to extend this deadline by 24 hours (2nd lvl deadline: **october 25th, 8PM GMT+2**).
+
+# 2. Seprating monolith:
+Since we would like to increase amount of requests-per-second to the **/cpu** and **/local_program** endpoints,
+I separated monolith we had into 2 services:
+- cpu_service - providing **/cpu** and **/local_program** endpoints - this will be scaled later (architectural approach)
+- db_service - providing **/age** endpoint - this does not need to be scaled
+
+Note that right now, **cpu_service** listens on port 8081 and **db_service** listens on port 8080 (see: docker-compose).
+I will resolve this later, when I will add Edge Load Balancer. 

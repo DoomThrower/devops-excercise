@@ -11,10 +11,16 @@ services:
     volumes:
       - ./db:/docker-entrypoint-initdb.d
 
-  backend:
-    build: ./backend
+  backend_db:
+    build: ./backend/db_service
     restart: always
     ports:
       - 8080:8080
     depends_on:
       - db
+
+  backend_cpu:
+    build: ./backend/cpu_service
+    restart: always
+    ports:
+      - 8081:8080

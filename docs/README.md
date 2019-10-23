@@ -29,7 +29,7 @@
       
 - [ ] **src/backend**: Refactor database access code (hardcoded credentials/endpoint, connection probably should 
       not be initiated on every request) - 45m
-- [ ] Prepare load-testing commands (e.g. curl), verifying consistency of the application - 45m
+- [x] Prepare load-testing commands (e.g. curl), verifying consistency of the application - 45m
 - [ ] Understand the nature of **cpu/local_program** endpoints (it could be possible to store a set of pre-computated 
       values for them using some sort of producer/consumer approach in order to increase requests-per-second) - 0m
 - [ ] Add Edge Load Balancer (I want to separate monolith, but still the endpoints should remain intact, preferably 

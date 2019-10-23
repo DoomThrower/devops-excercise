@@ -1,7 +1,10 @@
 import json
 
 from bottle import route, run, request, response
-from postgres import Postgres
+from pymongo import MongoClient
+
+# Init MongoDB connection
+client = MongoClient('mongodb://mongodb_user:password123@mongodb-primary:27017/name_age', 27017)
 
 # Local cache
 cache = {}
@@ -22,18 +25,19 @@ def get_from_db(name):
     """
     Given a name, return the ages from a database
     """
-    db = Postgres("postgres://postgres:backend@db/backend")
     return list(
-        map(lambda record: (name, record.age),
-            db.all(f"SELECT * FROM name_age WHERE \"name\"='{name}' ")))
+        map(lambda record: (record['name'], record['age']),
+            client.name_age.customers.find({'name': name})))
 
 
 def insert_into_db(name, age):
     """
     Given a name and an age, insert into a database
     """
-    db = Postgres("postgres://postgres:backend@db/backend")
-    db.run(f"INSERT INTO name_age VALUES ('{name}', {age})")
+    client.name_age.customers.insert_one({
+        "name": name,
+        "age": age
+    })
 
 
 ################
@@ -86,7 +90,8 @@ def get_age(name):
     # implementation doesn't have consistency among different instances.
     # Please, fix this issue or explain how are you going to implement a
     # cache with multi-service awareness.
-    if name not in cache:
+
+    if cache.get(name) is None:
         do_log("DEBUG", f"{name} not in cache")
         cache[name] = get_from_db(name)
         do_log("DEBUG", f"cache[{name}] = {cache[name]}")

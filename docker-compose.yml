@@ -1,15 +1,44 @@
 version: "3"
 services:
-  # TODO: This database is used for key -> value storage, is it efficient?
-  #       and scalable?
-  db:
-    image: postgres
+  mongodb-primary:
+    image: 'bitnami/mongodb:4.0.13'
     restart: always
     environment:
-      - POSTGRES_DB=backend
-      - POSTGRES_PASSWORD=backend
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_USERNAME=mongodb_user
+      - MONGODB_PASSWORD=password123
+      - MONGODB_DATABASE=name_age
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
+      - 'mongodb_master_data:/bitnami'
+
+  mongodb-secondary:
+    image: 'bitnami/mongodb:4.0.13'
+    restart: always
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_PRIMARY_HOST=mongodb-primary
+      - MONGODB_PRIMARY_PORT_NUMBER=27017
+      - MONGODB_PRIMARY_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+
+  mongodb-arbiter:
+    image: 'bitnami/mongodb:4.0.13'
+    restart: always
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_PRIMARY_HOST=mongodb-primary
+      - MONGODB_PRIMARY_PORT_NUMBER=27017
+      - MONGODB_PRIMARY_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
 
   backend_db:
     build: ./backend/db_service
@@ -17,10 +46,16 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - db
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
 
   backend_cpu:
     build: ./backend/cpu_service
     restart: always
     ports:
       - 8081:8080
+
+volumes:
+  mongodb_master_data:
+    driver: local

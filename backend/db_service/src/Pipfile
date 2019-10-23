@@ -7,7 +7,7 @@ verify_ssl = true
 
 [packages]
 bottle = "*"
-postgres = "*"
+pymongo = "*"
 
 [requires]
 python_version = "3.7"

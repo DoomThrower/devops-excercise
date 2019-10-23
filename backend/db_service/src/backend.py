@@ -2,6 +2,7 @@ import json
 
 from bottle import route, run, request, response
 from pymongo import MongoClient
+from prometheus_client import start_http_server, Counter
 
 # Init MongoDB connection
 client = MongoClient('mongodb://mongodb_user:password123@mongodb-primary:27017/name_age', 27017)
@@ -9,6 +10,8 @@ client = MongoClient('mongodb://mongodb_user:password123@mongodb-primary:27017/n
 # Local cache
 cache = {}
 
+# Prometheus metrics
+request_counter = Counter('request_counter', 'Amount of requests to endpoints', ['method', 'endpoint'])
 
 ###############
 ### Helpers
@@ -54,6 +57,7 @@ def put_age():
         }
     """
     do_log("DEBUG", "Calling put_age endpoint")
+    request_counter.labels('put', '/age').inc()
     if not request.json:
         response.status = 400
         msg = "This endpoint only accept JSON objects"
@@ -86,6 +90,7 @@ def put_age():
 @route("/age/<name>", method="GET")
 def get_age(name):
     do_log("DEBUG", "Calling get_age endpoint")
+    request_counter.labels('get', '/age').inc()
     # TODO: Imagine you want to have multiple services, local cache with this
     # implementation doesn't have consistency among different instances.
     # Please, fix this issue or explain how are you going to implement a
@@ -99,7 +104,9 @@ def get_age(name):
     return json.dumps(cache[name])
         
 
-do_log("INFO", "Starting server")
+# INFO: Starting prometheus_metrics sever
+start_http_server(8000)
 
+do_log("INFO", "Starting server")
 # INFO: Starting only one thread to manage all request
 run(host='0.0.0.0', port=8080)

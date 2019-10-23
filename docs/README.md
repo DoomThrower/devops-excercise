@@ -1,6 +1,6 @@
 ## Tasks from TODO:
 - [ ] **src/backend**: Locate and fix security breach - 1h30m
-- [ ] **src/backend**: Improve number of requests per second **/cpu** and **/local_program** endpoints 
+- [x] **src/backend**: Improve number of requests per second **/cpu** and **/local_program** endpoints 
       (architecture-wise approach - separate monolith, provide additional containers) - 1h30m
 - [ ] **src/backend**: Provide a solution for the cache with multi-service awareness - 1h30m
 - [x] **Dockerfile**: Fix issue with needless steps in docker image on every code change - 15m
@@ -12,8 +12,8 @@
   - [x] Separate monolith (2 services: **db access** and **cpu/local_program**) -1h30m (accounted earlier)
   - [x] Replace db service with something more scalable/resilient - 2h30m (accounted earlier)
 - Add monitoring and measurement to the project (prometheus/grafana metrics)
-  - [ ] Add prometheus metrics to code - 45m
-  - [ ] Add prometheus container - 15m
+  - [x] Add prometheus metrics to code - 45m
+  - [x] Add prometheus container - 15m
   - [ ] Add grafana container - 15m
   - [ ] Provide basic grafana dashboards - 45m
 - Centralize all logs (ELK stack probably)
@@ -27,12 +27,12 @@
       
       My suspicion was wrong - this line is responsible for clearing cache prior to inserting new data.
       
-- [ ] **src/backend**: Refactor database access code (hardcoded credentials/endpoint, connection probably should 
+- [x] **src/backend**: Refactor database access code (hardcoded credentials/endpoint, connection probably should 
       not be initiated on every request) - 45m
 - [x] Prepare load-testing commands (e.g. curl), verifying consistency of the application - 45m
-- [ ] Understand the nature of **cpu/local_program** endpoints (it could be possible to store a set of pre-computated 
+- [x] Understand the nature of **cpu/local_program** endpoints (it could be possible to store a set of pre-computated 
       values for them using some sort of producer/consumer approach in order to increase requests-per-second) - 0m
-- [ ] Add Edge Load Balancer (I want to separate monolith, but still the endpoints should remain intact, preferably 
+- [x] Add Edge Load Balancer (I want to separate monolith, but still the endpoints should remain intact, preferably 
       regardless of amount of service containers) - 1h
 - [ ] Verify that there was an issue in the caching mechanism of **db_service** in the initial code (see: last paragrph
       of section 3.)
@@ -83,3 +83,46 @@ a specific user **after** PUTting his age, caching mechanism seemed to be not wo
 than the list). I located and resolved the issue in the **db_service/src/backend.py** - `put_age()` method sets `cache`
 value to `None`, but `get_age()` method was checking only if the key in `cache` exists and **not** the value. Will need
 to verify that scenario on the initial code (task added).
+
+# 4. Traefik Load Balancing
+Load Balancing supported by Service Discovery is a nice thing to have when it comes to service-based approach. Initially
+I starded with custom nginx image, resolving requests to the **backend_db** and **backend_cpu** services. It worked as
+intended, as long as I did not scale respective containers (newly created containers did not get any traffic). Thats
+when I remembered about [Traefik](https://traefik.io/) - a Cloud Native Edge Router (I always wanted to give it a shot).
+See **docker-compose.yml** `traefik` service, as well as `labels` subsections of **backend_db** and **backend_cpu** 
+services. Now, both of those services are autodiscovered correctly.
+
+There is a side effect to the [Traefik](https://traefik.io/) approach. In order to properly resolve network route,
+additional header is needed.
+
+Old example curl:
+
+```curl localhost:8080/age/Lukas```
+
+New example curl (also, note the port change, from 8080 to 80):
+
+```curl -H "Host: db.docker.localhost" localhost/age/Lukas```
+
+Host header definitions are as follows (as defined in **docker-compose.yml** [Traefik](https://traefik.io/) labels:
+- **backend_db** service: `Host: db.docker.localhost`
+- **backend_cpu** service: `Host: cpu.docker.localhost`
+
+Should this change prove unacceptable, additional Edge Load Balancer can be provided (I deemed it unnecessary).
+
+To sum up: from now on, [Traefik](https://traefik.io/) load balances **backend_db** and **backend_cpu** endpoints on
+port `80`, with its web panel available at port `8080` (an interesting thing to check out, highly recommend it!).
+
+# 5. Prometheus metrics
+Due to the fact that we want to gather some metrics from our services, I extended `backend.py` code of both services
+with a simple example - counter for requests on each endpoint - `request_counter` (will prove useful to see how scaling 
+could improve request-per-second ratio). Obviously, this Proof-of-Concept mechanism can be extended further should the 
+need appear.
+
+Each of **backend_db** and **backend_cpu** containers now exposes additional port for metrics (`8000`) which is scraped
+by prometheus.
+
+Unfortunately, I did not manage to find a sensible way to provide autodiscovery of container targets for prometheus
+metrics. As such, I decided to simply hardcode targets for 5 containers of each service (it is not too painful on the
+network and is easy to manage) - see: `prometheus/prometheus.yml`.
+
+To sum up: from now on, prometheus dashboard is available on port `9090`.

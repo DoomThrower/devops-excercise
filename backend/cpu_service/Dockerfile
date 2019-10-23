@@ -1,5 +1,6 @@
 FROM python:3.7
-EXPOSE 8080
+# Port 8000 is exposed for metrics
+EXPOSE 8080 8000
 WORKDIR /app
 
 # Dependencies will not change too often, so lets separate that step

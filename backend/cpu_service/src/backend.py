@@ -5,9 +5,11 @@ import os
 import random
 
 from bottle import route, run, response
+from prometheus_client import start_http_server, Counter
+import gunicorn
 
-# Local cache
-cache = {}
+# Prometheus metrics
+request_counter = Counter('request_counter', 'Amount of requests to endpoints', ['method', 'endpoint'])
 
 
 ###############
@@ -53,6 +55,7 @@ def call_local_program():
 @route('/cpu')
 def cpu():
     do_log("DEBUG", "Calling cpu endpoint")
+    request_counter.labels('get', '/cpu').inc()
     # This function must call use_cpu_for_a_while() at least once
     response.content_type = 'application/json'
     return json.dumps(use_cpu_for_a_while())
@@ -63,12 +66,19 @@ def cpu():
 @route('/local_program')
 def local_program():
     do_log("DEBUG", "Calling local_program endpoint")
+    request_counter.labels('get', '/local_program').inc()
     # This function must call call_local_program() at least once
     response.content_type = 'application/json'
     return json.dumps(call_local_program())
-        
+
+
+# INFO: Starting prometheus_metrics sever
+start_http_server(8000)
 
 do_log("INFO", "Starting server")
-
 # INFO: Starting only one thread to manage all request
 run(host='0.0.0.0', port=8080)
+
+# TODO: this piece lets me run this service in a multiproc fashion, which speeds up request handling. It does mess up
+#  prometheus metrics, but that can be resolved if I have the time
+#run(host='0.0.0.0', port=8080, server='gunicorn', workers=4)

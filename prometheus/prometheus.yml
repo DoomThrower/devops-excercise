@@ -1,0 +1,15 @@
+scrape_configs:
+- job_name: backend
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - devops_exercise_backend_db_1:8000
+    - devops_exercise_backend_db_2:8000
+    - devops_exercise_backend_db_3:8000
+    - devops_exercise_backend_db_4:8000
+    - devops_exercise_backend_db_5:8000
+    - devops_exercise_backend_cpu_1:8000
+    - devops_exercise_backend_cpu_2:8000
+    - devops_exercise_backend_cpu_3:8000
+    - devops_exercise_backend_cpu_4:8000
+    - devops_exercise_backend_cpu_5:8000

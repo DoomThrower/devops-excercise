@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 bottle = "*"
 pymongo = "*"
+prometheus_client = "*"
 
 [requires]
 python_version = "3.7"

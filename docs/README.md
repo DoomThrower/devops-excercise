@@ -14,8 +14,8 @@
 - Add monitoring and measurement to the project (prometheus/grafana metrics)
   - [x] Add prometheus metrics to code - 45m
   - [x] Add prometheus container - 15m
-  - [ ] Add grafana container - 15m
-  - [ ] Provide basic grafana dashboards - 45m
+  - [x] Add grafana container - 15m
+  - [x] Provide basic grafana dashboards - 45m
 - Centralize all logs (ELK stack probably)
   - [ ] Solve how to aggregate docker logs - 1h
   - [ ] Add ELK stack containers (unless something better/easier will appear during research) - 2h
@@ -126,3 +126,16 @@ metrics. As such, I decided to simply hardcode targets for 5 containers of each 
 network and is easy to manage) - see: `prometheus/prometheus.yml`.
 
 To sum up: from now on, prometheus dashboard is available on port `9090`.
+
+# 6. Grafana dashboard
+After having prometheus up and running, adding grafana with a sample dashboard was fairly easy. The cool part is that
+I preinject grafana with datasource (prometheus) and dashboard (request, using metrics added to **backend_db** and 
+**backend_cpu** services), see: `grafana` directory and `docker-compose.yml` `grafana` section.
+
+When logging into grafana for the first time, following credentials need to be provided:
+- Login: `admin`
+- Password: `admin`
+
+After initial log in, change password procedure will occur.
+
+To sum up: from now on, grafana is available on port `3000`

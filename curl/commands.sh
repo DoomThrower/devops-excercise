@@ -10,3 +10,4 @@ curl -H "Host: db.docker.localhost" localhost/age/Lukas
 #seq 4 | parallel -n0 -j2 "curl -H 'Host: cpu.docker.localhost' localhost/local_program"
 #seq 100000 | parallel -j0 --joblog log "curl -H 'Host: cpu.docker.localhost' localhost/local_program" ">" {}.txt
 #cut -f 4 log
+#seq 100000 | parallel -j0 "curl -H 'Host: cpu.docker.localhost' localhost/local_program"

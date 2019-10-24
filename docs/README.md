@@ -17,8 +17,8 @@
   - [x] Add grafana container - 15m
   - [x] Provide basic grafana dashboards - 45m
 - Centralize all logs (ELK stack probably)
-  - [ ] Solve how to aggregate docker logs - 1h
-  - [ ] Add ELK stack containers (unless something better/easier will appear during research) - 2h
+  - [x] Solve how to aggregate docker logs - 1h
+  - [x] Add ELK stack containers (unless something better/easier will appear during research) - 2h
 
 # My task suggestions (based on code provided):
 - [x] **src/backend**: Fix the cpu() method in (curl returns 500 error rather than value) - 5m
@@ -34,7 +34,7 @@
       values for them using some sort of producer/consumer approach in order to increase requests-per-second) - 0m
 - [x] Add Edge Load Balancer (I want to separate monolith, but still the endpoints should remain intact, preferably 
       regardless of amount of service containers) - 1h
-- [ ] Verify that there was an issue in the caching mechanism of **db_service** in the initial code (see: last paragrph
+- [ ] Verify that there was an issue in the caching mechanism of **db_service** in the initial code (see: last paragraph
       of section 3.)
       
 # 1. Approach:
@@ -139,3 +139,14 @@ When logging into grafana for the first time, following credentials need to be p
 After initial log in, change password procedure will occur.
 
 To sum up: from now on, grafana is available on port `3000`
+
+# 7. ELK stack
+In order to properly aggregate logs from containers, based on 
+[this](https://medium.com/@karthi.net/how-to-aggregate-docker-container-logs-and-analyse-with-elk-stack-fb88cf5a98a4)
+article, I added additional standalone `elk/docker-compose.yml` which is responsible for provisioning ELK stack.
+
+After adding `logstash-*` index on Kibana dashboard (port 5601), logs from all containers flow smoothly to a centralised
+entity.
+
+To sum up: from now on, kibana is available on port `5601` **after** the additional standalone `elk/docker-compose.yaml`
+is started.

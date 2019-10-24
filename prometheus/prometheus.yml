@@ -8,8 +8,18 @@ scrape_configs:
     - devops_exercise_backend_db_3:8000
     - devops_exercise_backend_db_4:8000
     - devops_exercise_backend_db_5:8000
+    - devops_exercise_backend_db_6:8000
+    - devops_exercise_backend_db_7:8000
+    - devops_exercise_backend_db_8:8000
+    - devops_exercise_backend_db_9:8000
+    - devops_exercise_backend_db_10:8000
     - devops_exercise_backend_cpu_1:8000
     - devops_exercise_backend_cpu_2:8000
     - devops_exercise_backend_cpu_3:8000
     - devops_exercise_backend_cpu_4:8000
     - devops_exercise_backend_cpu_5:8000
+    - devops_exercise_backend_cpu_6:8000
+    - devops_exercise_backend_cpu_7:8000
+    - devops_exercise_backend_cpu_8:8000
+    - devops_exercise_backend_cpu_9:8000
+    - devops_exercise_backend_cpu_10:8000

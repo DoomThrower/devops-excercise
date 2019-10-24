@@ -34,8 +34,10 @@
       values for them using some sort of producer/consumer approach in order to increase requests-per-second) - 0m
 - [x] Add Edge Load Balancer (I want to separate monolith, but still the endpoints should remain intact, preferably 
       regardless of amount of service containers) - 1h
-- [ ] Verify that there was an issue in the caching mechanism of **db_service** in the initial code (see: last paragraph
+- [x] Verify that there was an issue in the caching mechanism of **db_service** in the initial code (see: last paragraph
       of section 3.)
+      
+      My suspicion was correct - old code behaved the same in such a scenario.
       
 # 1. Approach:
 Based on these tasks, I estimate that fulfilling them would take me about 15 hours - that is, obviously, assuming no 
@@ -145,8 +147,23 @@ In order to properly aggregate logs from containers, based on
 [this](https://medium.com/@karthi.net/how-to-aggregate-docker-container-logs-and-analyse-with-elk-stack-fb88cf5a98a4)
 article, I added additional standalone `elk/docker-compose.yml` which is responsible for provisioning ELK stack.
 
-After adding `logstash-*` index on Kibana dashboard (port 5601), logs from all containers flow smoothly to a centralised
+After adding `logstash-*` index on Kibana dashboard (port `5601`), logs from all containers flow smoothly to a centralised
 entity.
 
 To sum up: from now on, kibana is available on port `5601` **after** the additional standalone `elk/docker-compose.yaml`
 is started.
+
+# 8. Leftovers
+2 tasks remain:
+- **src/backend**: Locate and fix security breach - unfortunately, I did not manage to locate the security issue.
+  I assume that it has something to do with the `/age` endpoint (as it is the endpoint where attacker can provide
+  malicious input). I tried both code injection, as well as sql injection, but to no avail. I also used some tools for
+  automated injectability inspection (e.g. sqlmap), but still, no luck. My guess is, that there may be a way to inject 
+  binary executable through `/age` endpoint logic, maybe to `/app/very_important_value` and then simply execute it via 
+  the `/local_program` endpoint, making the possibilities endless. Still, since I did not manage to find a payload, all
+  I can do is talk.
+- **src/backend**: Provide a solution for the cache with multi-service awareness - all I can do is to propose 
+  a potential solution - additional memcached-based singular service, accessible by all **backend_db** services, where
+  values of queries are stored similarly to how its done now in each of the db services. This approach comes with its
+  own set of problems (redefining connections when using `/age` endpoint) and as such, all I decided to do is to provide
+  this proposal, rather than try to implement it.
